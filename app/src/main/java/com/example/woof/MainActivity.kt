@@ -21,7 +21,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -115,8 +120,21 @@ fun DogItem(
     ) {
 
         var expanded by remember {mutableStateOf(false)}
+        val color by animateColorAsState(
+            targetValue = if (expanded) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.primaryContainer,
+        )
 
-        Column() {
+        Column(modifier = Modifier
+            .animateContentSize
+                (
+                animationSpec = spring
+                    (
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMediumLow
+                            )
+                        )
+            .background(color = color)
+        ) {
 
 
             Row(
@@ -147,28 +165,23 @@ fun DogItem(
 }
 
 @Composable
-fun DogItemButton(
-    expanded : Boolean,
+private fun DogItemButton(
+    expanded: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
-)
-{
+) {
     IconButton(
         onClick = onClick,
         modifier = modifier
-    ){
-        Icon(imageVector = if(expanded)
-        {
-            Icons.Filled.ExpandLess
-        }
-        {
-            else
-                Icons.Filled.ExpandMore
-            }
+    ) {
+        Icon(
+            imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+            contentDescription = stringResource(R.string.expand_button_content_description),
+            tint = MaterialTheme.colorScheme.secondary
+        )
     }
-
-    
 }
+
 
 /**
  * Composable that displays a Top Bar with an icon and text.
